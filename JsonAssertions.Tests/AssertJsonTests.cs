@@ -26,6 +26,20 @@ namespace JsonAssertions.Tests
         }
 
         [Test]
+        public void AreEquals_UnequalIntPropertyValues_Fail()
+        {
+            const string expectedObject = "{prop1:'value1', int:15}";
+            const string actualObject = "{prop1:'value1', int:16}";
+
+            var assertionException =
+                Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
+
+            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
+                                          "Expected: {1}. " +
+                                          "But was: {2}", "int", "15", "16"), assertionException.Message);
+        }
+
+        [Test]
         public void AreEquals_MissingProperty_Fail()
         {
             const string expectedObject = "{name:'value', missing:'yes'}";
@@ -59,7 +73,43 @@ namespace JsonAssertions.Tests
 
             Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
                                           "Expected: {1}. " +
-                                          "But was: {2}", "key", "value", "value2"), assertionException.Message);
+                                          "But was: {2}", "nested.key", "value", "value2"), assertionException.Message);
+        }
+
+        [Test]
+        public void AreEquals_NestedArraysDifferentLength_Fail()
+        {
+            const string expectedObject = "{prop1:'value1', arr:[1, '2', {key: 'value'}, 5]}";
+            const string actualObject = "{prop1:'value1', arr:[1, '3', {key: 'value'}]}";
+            var assertionException =
+                Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
+            Assert.AreEqual(
+                string.Format("Different arrays length at {0}. Expected: {1}, but was: {2}", "arr", "4", "3"),
+                assertionException.Message);
+        }
+
+        [Test]
+        public void AreEquals_NestedArrays_Fail()
+        {
+            const string expectedObject = "{prop1:'value1', arr:[1, '2', {key: 'value'}]}";
+            const string actualObject = "{prop1:'value1', arr:[1, '3', {key: 'value'}]}";
+            var assertionException =
+                Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
+            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
+                                          "Expected: {1}. " +
+                                          "But was: {2}", "arr[1]", "2", "3"), assertionException.Message);
+        }
+
+        [Test]
+        public void AreEquals_NestedArraysDiffObjects_Fail()
+        {
+            const string expectedObject = "{prop1:'value1', arr:[1, '2', {key: 'value2'}]}";
+            const string actualObject = "{prop1:'value1', arr:[1, '2', {key: 'value'}]}";
+            var assertionException =
+                Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
+            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
+                                          "Expected: {1}. " +
+                                          "But was: {2}", "arr[2].key", "value2", "value"), assertionException.Message);
         }
     }
 }

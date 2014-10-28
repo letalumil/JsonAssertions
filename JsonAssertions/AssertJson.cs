@@ -24,21 +24,37 @@ namespace JsonAssertions
             {
                 var expectedJToken = expectedJObject[property.Key];
                 var actualJToken = actualJObject[property.Key];
+                AreEquals(expectedJToken, actualJToken);
+            }
+        }
 
-                switch (property.Value.Type)
-                {
-                    case JTokenType.String:
-                        var expectedString = expectedJToken.Value<string>();
-                        var actualString = actualJToken.Value<string>();
-                        if (expectedString != actualString)
-                            Assert.Fail("Property \"{0}\" does not match. " +
-                                        "Expected: {1}. " +
-                                        "But was: {2}", property.Key, expectedString, actualString);
-                        break;
-                    case JTokenType.Object:
-                        AreEquals(expectedJToken.Value<JObject>(), actualJToken.Value<JObject>());
-                        break;
-                }
+        public static void AreEquals(JToken expectedJToken, JToken actualJToken)
+        {
+            switch (expectedJToken.Type)
+            {
+                case JTokenType.Array:
+                    var expectedJArray = expectedJToken.Value<JArray>();
+                    var actualJArray = actualJToken.Value<JArray>();
+                    if (expectedJArray.Count != actualJArray.Count)
+                        Assert.Fail("Different arrays length at {0}. Expected: {1}, but was: {2}",
+                            expectedJToken.Path,
+                            expectedJArray.Count, actualJArray.Count);
+                    for (var i = 0; i < expectedJArray.Count; i++)
+                    {
+                        AreEquals(expectedJArray[i], actualJArray[i]);
+                    }
+                    break;
+                case JTokenType.Object:
+                    AreEquals(expectedJToken.Value<JObject>(), actualJToken.Value<JObject>());
+                    break;
+                default:
+                    var expectedString = expectedJToken.Value<string>();
+                    var actualString = actualJToken.Value<string>();
+                    if (expectedString != actualString)
+                        Assert.Fail("Property \"{0}\" does not match. " +
+                                    "Expected: {1}. " +
+                                    "But was: {2}", expectedJToken.Path, expectedString, actualString);
+                    break;
             }
         }
 
