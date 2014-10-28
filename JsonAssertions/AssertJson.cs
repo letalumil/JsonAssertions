@@ -22,10 +22,23 @@ namespace JsonAssertions
 
             foreach (var property in expectedJObject)
             {
-                if (actualJObject[property.Key] != expectedJObject[property.Key])
-                    Assert.Fail("Property \"{0}\" does not match\r\n" +
-                                "Expected: {1}\r\n" +
-                                "But was: {2}", property.Key, property.Value, actualJObject[property.Key]);
+                var expectedJToken = expectedJObject[property.Key];
+                var actualJToken = actualJObject[property.Key];
+
+                switch (property.Value.Type)
+                {
+                    case JTokenType.String:
+                        var expectedString = expectedJToken.Value<string>();
+                        var actualString = actualJToken.Value<string>();
+                        if (expectedString != actualString)
+                            Assert.Fail("Property \"{0}\" does not match. " +
+                                        "Expected: {1}. " +
+                                        "But was: {2}", property.Key, expectedString, actualString);
+                        break;
+                    case JTokenType.Object:
+                        AreEquals(expectedJToken.Value<JObject>(), actualJToken.Value<JObject>());
+                        break;
+                }
             }
         }
 
