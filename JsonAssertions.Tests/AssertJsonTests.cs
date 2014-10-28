@@ -111,5 +111,20 @@ namespace JsonAssertions.Tests
                                           "Expected: {1}. " +
                                           "But was: {2}", "arr[2].key", "value2", "value"), assertionException.Message);
         }
+
+        [Test]
+        public void AreEquals_ComplexJson_Fail()
+        {
+            const string expectedObject =
+                "{\"array\":[1,2,3],\"boolean\":true,\"null\":null,\"number\":123,\"object\":{\"a\":\"b\",\"c\":\"d\",\"e\":\"f\",\"test\":{\"arr\":[{\"key\":{\"diff\":\"val\"}},{}]},\"name\":\"value\"},\"string\":\"Hello World\"}";
+            const string actualObject =
+                "{\"array\":[1,2,3],\"boolean\":true,\"null\":null,\"number\":123,\"object\":{\"a\":\"b\",\"c\":\"d\",\"e\":\"f\",\"test\":{\"arr\":[{\"key\":{\"diff\":\"val2\"}},{}]},\"name\":\"value\"},\"string\":\"Hello World\"}";
+            var assertionException =
+                Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
+            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
+                                          "Expected: {1}. " +
+                                          "But was: {2}", "object.test.arr[0].key.diff", "val", "val2"),
+                assertionException.Message);
+        }
     }
 }
