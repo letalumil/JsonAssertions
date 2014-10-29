@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
@@ -45,15 +46,16 @@ namespace JsonAssertions
                     }
                     break;
                 case JTokenType.Object:
+                    if (expectedJToken.Type != actualJToken.Type)
+                        Assert.Fail("Type mismatch. {0} expected to be {1}, but was {2}", expectedJToken.Path,
+                            expectedJToken.Type, actualJToken.Type);
                     AreEquals(expectedJToken.Value<JObject>(), actualJToken.Value<JObject>());
                     break;
                 default:
                     var expectedString = expectedJToken.Value<string>();
                     var actualString = actualJToken.Value<string>();
-                    if (expectedString != actualString)
-                        Assert.Fail("Property \"{0}\" does not match. " +
-                                    "Expected: {1}. " +
-                                    "But was: {2}", expectedJToken.Path, expectedString, actualString);
+                    Assert.AreEqual(expectedString, actualString,
+                        string.Format("Property \"{0}\" does not match.", expectedJToken.Path));
                     break;
             }
         }

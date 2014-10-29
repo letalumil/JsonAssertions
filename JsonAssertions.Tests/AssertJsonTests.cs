@@ -19,10 +19,8 @@ namespace JsonAssertions.Tests
 
             var assertionException =
                 Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
-
-            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
-                                          "Expected: {1}. " +
-                                          "But was: {2}", "name", "value", "value2"), assertionException.Message);
+            Assert.IsTrue(
+                assertionException.Message.StartsWith(string.Format("  Property \"{0}\" does not match.", "name")));
         }
 
         [Test]
@@ -33,10 +31,8 @@ namespace JsonAssertions.Tests
 
             var assertionException =
                 Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
-
-            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
-                                          "Expected: {1}. " +
-                                          "But was: {2}", "int", "15", "16"), assertionException.Message);
+            Assert.IsTrue(
+                assertionException.Message.StartsWith(string.Format("  Property \"{0}\" does not match.", "int")));
         }
 
         [Test]
@@ -70,10 +66,8 @@ namespace JsonAssertions.Tests
             const string actualObject = "{prop1:'value1', nested0:{}, nested: {key:'value2'}}";
             var assertionException =
                 Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
-
-            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
-                                          "Expected: {1}. " +
-                                          "But was: {2}", "nested.key", "value", "value2"), assertionException.Message);
+            Assert.IsTrue(
+                assertionException.Message.StartsWith(string.Format("  Property \"{0}\" does not match.", "nested.key")));
         }
 
         [Test]
@@ -95,9 +89,8 @@ namespace JsonAssertions.Tests
             const string actualObject = "{prop1:'value1', arr:[1, '3', {key: 'value'}]}";
             var assertionException =
                 Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
-            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
-                                          "Expected: {1}. " +
-                                          "But was: {2}", "arr[1]", "2", "3"), assertionException.Message);
+            Assert.IsTrue(
+                assertionException.Message.StartsWith(string.Format("  Property \"{0}\" does not match.", "arr[1]")));
         }
 
         [Test]
@@ -107,9 +100,8 @@ namespace JsonAssertions.Tests
             const string actualObject = "{prop1:'value1', arr:[1, '2', {key: 'value'}]}";
             var assertionException =
                 Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
-            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
-                                          "Expected: {1}. " +
-                                          "But was: {2}", "arr[2].key", "value2", "value"), assertionException.Message);
+            Assert.IsTrue(
+                assertionException.Message.StartsWith(string.Format("  Property \"{0}\" does not match.", "arr[2].key")));
         }
 
         [Test]
@@ -121,10 +113,9 @@ namespace JsonAssertions.Tests
                 "{\"array\":[1,2,3],\"boolean\":true,\"null\":null,\"number\":123,\"object\":{\"a\":\"b\",\"c\":\"d\",\"e\":\"f\",\"test\":{\"arr\":[{\"key\":{\"diff\":\"val2\"}},{}]},\"name\":\"value\"},\"string\":\"Hello World\"}";
             var assertionException =
                 Assert.Throws<AssertionException>(() => AssertJson.AreEquals(expectedObject, actualObject));
-            Assert.AreEqual(string.Format("Property \"{0}\" does not match. " +
-                                          "Expected: {1}. " +
-                                          "But was: {2}", "object.test.arr[0].key.diff", "val", "val2"),
-                assertionException.Message);
+            Assert.IsTrue(
+                assertionException.Message.StartsWith(string.Format("  Property \"{0}\" does not match.",
+                    "object.test.arr[0].key.diff")));
         }
     }
 }
